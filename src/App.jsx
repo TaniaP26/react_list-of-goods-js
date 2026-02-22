@@ -28,32 +28,39 @@ export const Goods = ({ goods }) => (
 );
 
 export const App = () => {
-  // const [sortField, setSortField] = useState(goodsFromServer);
   const [sortField, setSortField] = useState('');
   const [reversed, setReversed] = useState(false);
 
-  const visibleGoods = (() => {
+  // ✅ named methods (вимога checklist)
+
+  const sortAlphabetically = () => setSortField('alphabetically');
+  const sortByLength = () => setSortField('length');
+  const toggleReverse = () => setReversed(prev => !prev);
+
+  const resetGoods = () => {
+    setSortField('');
+    setReversed(false);
+  };
+
+  const getVisibleGoods = () => {
     let goods = [...goodsFromServer];
 
-    // Сортування
-    if (sortField === 'length') {
-      goods.sort((a, b) => a.length - b.length);
-    } else if (sortField === 'alphabeticaly') {
+    if (sortField === 'alphabetically') {
       goods.sort((a, b) => a.localeCompare(b));
     }
 
-    // Reset
-    if (sortField === 'reset') {
-      goods = [...goodsFromServer];
+    if (sortField === 'length') {
+      goods.sort((a, b) => a.length - b.length);
     }
 
-    // Перевернути масив, якщо активне
     if (reversed) {
       goods.reverse();
     }
 
     return goods;
-  })();
+  };
+
+  const visibleGoods = getVisibleGoods();
 
   return (
     <div className="section content">
@@ -62,9 +69,9 @@ export const App = () => {
       <div className="buttons">
         <button
           type="button"
-          onClick={() => setSortField('alphabeticaly')}
+          onClick={sortAlphabetically}
           className={classNames('button is-info', {
-            'is-light': sortField !== 'alphabeticaly',
+            'is-light': sortField !== 'alphabetically',
           })}
         >
           Sort alphabetically
@@ -72,7 +79,7 @@ export const App = () => {
 
         <button
           type="button"
-          onClick={() => setSortField('length')}
+          onClick={sortByLength}
           className={classNames('button is-success', {
             'is-light': sortField !== 'length',
           })}
@@ -82,7 +89,7 @@ export const App = () => {
 
         <button
           type="button"
-          onClick={() => setReversed(prev => !prev)}
+          onClick={toggleReverse}
           className={classNames('button is-warning', {
             'is-light': !reversed,
           })}
@@ -93,10 +100,7 @@ export const App = () => {
         {(sortField || reversed) && (
           <button
             type="button"
-            onClick={() => {
-              setSortField('');
-              setReversed(false);
-            }}
+            onClick={resetGoods}
             className="button is-danger is-light"
           >
             Reset
